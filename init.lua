@@ -238,7 +238,25 @@ require('lazy').setup({
   --    require('Comment').setup({})
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  { 'numToStr/Comment.nvim', opts = {}, config = function()
+    require('Comment').setup()
+    -- use ctrl + / to comment out a line
+    -- Normal mode keymap
+    vim.keymap.set('n', '<C-_>', function()
+        -- Check if a count is provided
+        if vim.v.count > 0 then
+            -- If count is provided, use the count mappings
+            return vim.v.count .. '<Plug>(comment_toggle_linewise_count)'
+        else
+            -- No count provided, toggle the current line
+            return '<Plug>(comment_toggle_linewise_current)'
+        end
+    end, { expr = true, desc = 'Toggle comment on current/multiple lines' })
+
+    -- Visual mode keymap
+    vim.keymap.set('x', '<C-_>', '<Plug>(comment_toggle_linewise_visual)', { desc = 'Toggle comment on selected text' })
+    end
+  },
 
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
@@ -383,23 +401,6 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
       vim.keymap.set('n', '<C-p>', builtin.find_files, { desc = 'Search Files [P]opup' })
-      -- use ctrl + / to comment out a line
-      local K = vim.keymap.set
-
-      -- Normal mode keymap
-      K('n', '<C-_>', function()
-          -- Check if a count is provided
-          if vim.v.count > 0 then
-              -- If count is provided, use the count mappings
-              return vim.v.count .. '<Plug>(comment_toggle_linewise_count)'
-          else
-              -- No count provided, toggle the current line
-              return '<Plug>(comment_toggle_linewise_current)'
-          end
-      end, { expr = true, desc = 'Toggle comment on current/multiple lines' })
-
-      -- Visual mode keymap
-      K('x', '<C-_>', '<Plug>(comment_toggle_linewise_visual)', { desc = 'Toggle comment on selected text' })
 
       -- Slightly advanced example of overriding default behavior and theme
       vim.keymap.set('n', '<leader>/', function()
