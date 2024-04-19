@@ -118,6 +118,9 @@ vim.opt.clipboard = 'unnamedplus'
 -- Enable break indent
 vim.opt.breakindent = true
 
+-- Enable hidden
+vim.opt.hidden = true
+
 -- Save undo history
 vim.opt.undofile = true
 
@@ -143,7 +146,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = {  tab = '▸ ', trail = '·', extends = '❯', precedes = '❮', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -238,24 +241,27 @@ require('lazy').setup({
   --    require('Comment').setup({})
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {}, config = function()
-    require('Comment').setup()
-    -- use ctrl + / to comment out a line
-    -- Normal mode keymap
-    vim.keymap.set('n', '<C-_>', function()
+  {
+    'numToStr/Comment.nvim',
+    opts = {},
+    config = function()
+      require('Comment').setup()
+      -- use ctrl + / to comment out a line
+      -- Normal mode keymap
+      vim.keymap.set('n', '<C-_>', function()
         -- Check if a count is provided
         if vim.v.count > 0 then
-            -- If count is provided, use the count mappings
-            return vim.v.count .. '<Plug>(comment_toggle_linewise_count)'
+          -- If count is provided, use the count mappings
+          return vim.v.count .. '<Plug>(comment_toggle_linewise_count)'
         else
-            -- No count provided, toggle the current line
-            return '<Plug>(comment_toggle_linewise_current)'
+          -- No count provided, toggle the current line
+          return '<Plug>(comment_toggle_linewise_current)'
         end
-    end, { expr = true, desc = 'Toggle comment on current/multiple lines' })
+      end, { expr = true, desc = 'Toggle comment on current/multiple lines' })
 
-    -- Visual mode keymap
-    vim.keymap.set('x', '<C-_>', '<Plug>(comment_toggle_linewise_visual)', { desc = 'Toggle comment on selected text' })
-    end
+      -- Visual mode keymap
+      vim.keymap.set('x', '<C-_>', '<Plug>(comment_toggle_linewise_visual)', { desc = 'Toggle comment on selected text' })
+    end,
   },
 
   -- Here is a more advanced example where we pass configuration
@@ -865,7 +871,96 @@ require('lazy').setup({
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
   },
-
+  -- Toggle terminal with a keybinding
+  {
+    'akinsho/toggleterm.nvim',
+    version = '*',
+    config = function()
+      require('toggleterm').setup {
+        open_mapping = [[<c-t>]],
+        direction = 'horizontal',
+      }
+    end,
+  },
+  {
+    'nvim-treesitter/nvim-treesitter-context',
+    version = '*',
+    opts = {},
+  },
+  -- lazy.nvim
+  {
+    'folke/noice.nvim',
+    event = 'VeryLazy',
+    opts = {
+      -- add any options here
+    },
+    dependencies = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      'MunifTanjim/nui.nvim',
+      -- OPTIONAL:
+      --   `nvim-notify` is only needed, if you want to use the notification view.
+      --   If not available, we use `mini` as the fallback
+      'rcarriga/nvim-notify',
+    },
+    config = function()
+      require('noice').setup {
+        lsp = {
+          -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+          override = {
+            ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
+            ['vim.lsp.util.stylize_markdown'] = true,
+            ['cmp.entry.get_documentation'] = true, -- requires hrsh7th/nvim-cmp
+          },
+        },
+        -- you can enable a preset for easier configuration
+        presets = {
+          bottom_search = true, -- use a classic bottom cmdline for search
+          command_palette = true, -- position the cmdline and popupmenu together
+          long_message_to_split = true, -- long messages will be sent to a split
+          inc_rename = false, -- enables an input dialog for inc-rename.nvim
+          lsp_doc_border = false, -- add a border to hover docs and signature help
+        },
+      }
+    end,
+  },
+  -- Show diagnostics in a trouble window
+  {
+    'folke/trouble.nvim',
+    branch = 'dev', -- IMPORTANT!
+    keys = {
+      {
+        '<leader>xx',
+        '<cmd>Trouble diagnostics toggle<cr>',
+        desc = 'Diagnostics (Trouble)',
+      },
+      {
+        '<leader>xX',
+        '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
+        desc = 'Buffer Diagnostics (Trouble)',
+      },
+      {
+        '<leader>cs',
+        '<cmd>Trouble symbols toggle focus=false<cr>',
+        desc = 'Symbols (Trouble)',
+      },
+      {
+        '<leader>cl',
+        '<cmd>Trouble lsp toggle focus=false win.position=right<cr>',
+        desc = 'LSP Definitions / references / ... (Trouble)',
+      },
+      {
+        '<leader>xL',
+        '<cmd>Trouble loclist toggle<cr>',
+        desc = 'Location List (Trouble)',
+      },
+      {
+        '<leader>xQ',
+        '<cmd>Trouble qflist toggle<cr>',
+        desc = 'Quickfix List (Trouble)',
+      },
+    },
+    opts = {}, -- for default options, refer to the configuration section for custom setup.
+  },
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -875,8 +970,8 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  require 'kickstart.plugins.debug',
-  require 'kickstart.plugins.indent_line',
+  -- require 'kickstart.plugins.debug',
+  -- require 'kickstart.plugins.indent_line',
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
