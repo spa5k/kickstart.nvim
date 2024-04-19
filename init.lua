@@ -146,7 +146,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = {  tab = '▸ ', trail = '·', extends = '❯', precedes = '❮', nbsp = '␣' }
+vim.opt.listchars = { tab = '▸ ', trail = '·', extends = '❯', precedes = '❮', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -880,6 +880,27 @@ require('lazy').setup({
         open_mapping = [[<c-t>]],
         direction = 'horizontal',
       }
+    end,
+  },
+  {
+    'fedepujol/move.nvim',
+    opts = {},
+    config = function()
+      require('move').setup {}
+      local opts = { noremap = true, silent = true }
+      -- Normal-mode commands
+      vim.keymap.set('n', '<A-j>', ':MoveLine(1)<CR>', opts)
+      vim.keymap.set('n', '<A-k>', ':MoveLine(-1)<CR>', opts)
+      vim.keymap.set('n', '<A-h>', ':MoveHChar(-1)<CR>', opts)
+      vim.keymap.set('n', '<A-l>', ':MoveHChar(1)<CR>', opts)
+      vim.keymap.set('n', '<leader>wf', ':MoveWord(1)<CR>', opts)
+      vim.keymap.set('n', '<leader>wb', ':MoveWord(-1)<CR>', opts)
+
+      -- Visual-mode commands
+      vim.keymap.set('v', '<A-j>', ':MoveBlock(1)<CR>', opts)
+      vim.keymap.set('v', '<A-k>', ':MoveBlock(-1)<CR>', opts)
+      vim.keymap.set('v', '<A-h>', ':MoveHBlock(-1)<CR>', opts)
+      vim.keymap.set('v', '<A-l>', ':MoveHBlock(1)<CR>', opts)
     end,
   },
   {
